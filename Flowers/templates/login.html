@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <form method="post">
+        {% csrf_token %}
+        <p>{{ error }}</p>
+        <label for="login">Введите логин</label>
+        <input type="text" id="login" name="login" maxlength="50" required>
+
+        <label for="password">Введите пароль</label>
+        <input type="text" id="password" name="password" minlength="8" required>
+
+        <label for="password_again">Повторите пароль</label>
+        <input type="text" id="password_again" name="password_again" minlength="8" required>
+
+        <button type="submit">Отправить</button>
+        <a href="http://127.0.0.1:8000/registry/">зарегистрироваться</a>
+    </form>
+</body>
+</html>

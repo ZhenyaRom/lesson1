@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <a href="http://127.0.0.1:8000/">Главная</a>
+    <br>
+    <a href="http://127.0.0.1:8000/catalog/">Каталог</a>
+    <br>
+    <a href="http://127.0.0.1:8000/login/">Вход/регистрация</a>
+    <br>
+    <a href="http://127.0.0.1:8000/basket/">Корзина</a>
+    <br>
+    <br>
+    <br>
+    <h1>Каталог</h1>
+
+    <ul>
+        {% for kind in page_obj %}
+            <li>
+                <form method="post">
+                {% csrf_token %}
+                {{ kind.name_kind }}
+                <p>{{ kind.specification_kind }}</p>
+
+                </form>
+
+            </li>
+        {% empty %}
+            <p>Нет товаров в этом разделе.</p>
+        {% endfor %}
+        </ul>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="select_page_len">Количество товаров странице:</label>
+        <select name="page_len" id="select_page_len" style="font-size: inherit;">
+            <option>1</option>
+            <option>3</option>
+            <option>5</option>
+            <option>10</option>
+        </select>
+        <button type="submit" >Применить</button>
+    </form>
+
+    <div class="pagination">
+        <p>Страницы:</p>
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}"><<</a>
+                <a href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+            {% endif %}
+            |{{ page_obj.number }}|{{ paginator.num_pages }}
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+                <a href="?page={{ page_obj.next_page_number }}">>>></a>
+            {% endif %}
+    </div>
+</body>
+</html>
