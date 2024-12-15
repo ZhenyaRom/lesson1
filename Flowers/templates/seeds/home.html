@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Главная
+{% endblock %}
+
+{% block content %}
+<h1>Лучший потому-что свой)</h1>
+<h2>Категории товаров</h2>
+<ul>
+    {% for kind in kinds %}
+        <li>
+            <a href="/kind/{{ kind.name_kind|urlencode }}/">{{ kind.name_kind }}</a>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}
+
+{% block pagination %}
+{% endblock %}

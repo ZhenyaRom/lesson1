@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Свяжитесь с нами{% endblock %}
+
+{% block content %}
+<h2>Свяжитесь с нами</h2>
+
+<form method="post" action="">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Отправить</button>
+</form>
+{% endblock %}
+{% block pagination %}
+{% endblock %}9

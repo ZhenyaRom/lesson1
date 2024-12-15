@@ -15,14 +15,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from seeds.views import welcome, catalog, login_func, basket, registry
+from django.urls import include, path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('catalog/', catalog),
-    path('login/', login_func),
-    path('basket/', basket),
-    path('registry/', registry),
-    path('', welcome),
+    path('', include('seeds.urls')),
+    # path('catalog/', catalog),
+    # path('login/', login_func),
+    # path('basket/', basket),
+    # path('registry/', registry),
+    # path('', welcome),
 ]

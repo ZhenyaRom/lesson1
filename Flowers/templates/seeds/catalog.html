@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Каталог
+{% endblock %}
+
+{% block content %}
+<nav>
+    <a href="/kind/all/">все</a> |
+    {% for kind in kinds %}
+    <a href="/kind/{{ kind.name_kind|urlencode }}/">{{ kind.name_kind }}</a> |
+    {% endfor %}
+<!--    <a href="?kind=цветы">Цветы</a> |-->
+<!--    <a href="?kind=ягоды">Ягоды</a> |-->
+<!--    <a href="?kind=разное">Разное</a>-->
+</nav>
+{% if page_obj %}
+    <ul>
+        {% for product in page_obj %}
+        <li>
+            <strong>{{ product.name_product }}</strong> - {{ product.price }} ₽<br>
+            Описание: {{ product.specification_product }}
+            <br>
+
+            <a href="/add_basket/{{ product.name_product|urlencode }}/"><button type="submit">Купить</button></a>
+        </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Товары отсутствуют</p>
+{% endif %}
+{% endblock %}
+
+{% block pagination %}
+    {{ block.super }}
+{% endblock %}

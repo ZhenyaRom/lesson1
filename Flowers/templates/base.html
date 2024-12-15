@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Семена-Букет{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href = "{% static 'seedsshop/styles.css' %}">
+</head>
+<body>
+    <header>
+        <img src="{% static 'seedsshop/images/tidalS.png' %}" alt="Логотип магазина" width="100">
+        <h1>Интернет-магазин семян <i>Букет</i></h1>
+        <nav>
+            <a href="http://127.0.0.1:8000/">Главная</a> |
+            <a href="http://127.0.0.1:8000/catalog/">Каталог</a> |
+            <a href="http://127.0.0.1:8000/login/">Вход/регистрация</a> |
+            <a href="http://127.0.0.1:8000/basket/">Корзина</a> |
+            <a href="http://127.0.0.1:8000/contact/">Сообщение</a> |
+        </nav>
+    </header>
+    <main>
+        {% block content %}
+        <h1>Добро пожаловать {{ user }}</h1>
+        Интернет-магазин семян "Букет" предлагает Вам купить семена российских и крупнейших мировых селекционно-семеноводческих компаний
+        {% endblock %}
+    </main>
+
+    {% block pagination %}
+    <form method="POST">
+        {% csrf_token %}
+        <label for="select_page_len">Количество товаров странице:</label>
+        <select name="page_len" id="select_page_len" style="font-size: inherit;">
+            <option>1</option>
+            <option>3</option>
+            <option>5</option>
+            <option>10</option>
+        </select>
+        <button type="submit" >Применить</button>
+    </form>
+
+    <div class="pagination">
+        <p>Страницы:</p>
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}"><<</a>
+            <a href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+        {% endif %}
+        |{{ page_obj.number }}|{{ paginator.num_pages }}
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+            <a href="?page={{ page_obj.next_page_number }}">>>></a>
+        {% endif %}
+    </div>
+    {% endblock %}
+    <footer>
+        <p>© 2024, Интернет-магазин</p>
+    </footer>
+</body>
+</html>

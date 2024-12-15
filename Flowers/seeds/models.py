@@ -23,7 +23,7 @@ class Kind(models.Model):
 class Category(models.Model):
     name_category = models.CharField(max_length=50, verbose_name='Название категории')
     specification_category = models.TextField(verbose_name='Описание категории')
-    kind = models.ForeignKey(Kind, on_delete=models.PROTECT, verbose_name='Вид растения')
+    kind = models.ForeignKey(Kind, on_delete=models.PROTECT, verbose_name='Вид')
 
     def __str__(self):
         return self.name_category
@@ -36,7 +36,8 @@ class Product(models.Model):
     amount = models.PositiveSmallIntegerField(verbose_name='Количество в упаковке')
     price = models.DecimalField(max_digits=5, decimal_places=2, verbose_name='Цена')
     balance = models.PositiveIntegerField(verbose_name='Остаток')
-    category = models.ForeignKey(Category, on_delete=models.PROTECT, verbose_name='Категория')
+    category = models.ForeignKey(Category, on_delete=models.PROTECT, null=True, blank=True, verbose_name='Категория')
+    kind = models.ForeignKey(Kind, on_delete=models.PROTECT, null=True, blank=True, verbose_name='Вид')
 
     def __str__(self):
         return self.name_product
@@ -46,7 +47,7 @@ class Order(models.Model):
     author_order = models.ForeignKey(Buyer, on_delete=models.DO_NOTHING, verbose_name='Автор заказа')
     name_buyer = models.CharField(max_length=100, verbose_name='Получатель')
     address_buyer = models.CharField(max_length=300, verbose_name='Адрес получателя')
-    list_product = models.ManyToManyField(Product, related_name='Заказы')
+    list_product = models.TextField(verbose_name='Список товаров')
     amount_order = models.DecimalField(max_digits=7, decimal_places=2, verbose_name='Стоимость заказа')
     date_create_order = models.DateTimeField(auto_now_add=True, verbose_name='Дата заказа')
     active_order = models.BooleanField(default=True, verbose_name='Заказ активный?')
