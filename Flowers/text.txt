@@ -12,3 +12,4 @@ header {
 
 h2 {
 color: #333;
+<!--            {{ instance[0].name_product }}  {{ instance[1][0] }}шт. &#45;&#45; {{ instance[1][2] }}руб.-->

@@ -1,11 +1,12 @@
 from django.urls import path
-from .views import catalog, login_func, basket, registry, welcome, home, contact_view, add_basket
+from .views import *
 
 urlpatterns = [
     path('add_basket/<str:name_product>/', add_basket, name='add_basket'),
     path('kind/<str:name_kind>/', catalog, name='catalog'),
     #path('catalog/', catalog, name='catalog'),
     path('login/', login_func, name='login_func'),
+    path('basket_order/', basket_order, name='basket_order'),
     path('basket/', basket, name='basket'),
     path('registry/', registry, name='registry'),
     path('contact/', contact_view, name='contact'),

@@ -8,6 +8,7 @@ from .models import *
 
 user = Buyer.objects.get(id=1)
 per_page = 3
+my_box = {}
 
 
 def contact_view(request):
@@ -18,7 +19,8 @@ def contact_view(request):
             email = form.cleaned_data['email']
             message = form.cleaned_data['message']
             # Здесь можно отправить сообщение по email или сохранить в базу данных
-            return HttpResponse(f"Спасибо, {name}! Ваше сообщение получено.")
+            return render(request, 'seeds/contact_plus.html', {'name': name})
+            #return HttpResponse(f"Спасибо, {name}! Мы получили ваше сообщение.")
     else:
         # GET-запрос, создаём пустую форму
         form = ContactForm()
@@ -35,7 +37,13 @@ def welcome(request):
 
 
 def add_basket(request, name_product):
-    print(name_product)
+    global my_box
+    product = Product.objects.get(name_product=name_product)
+    if product in my_box.keys():
+        count = my_box.get(product)[0] + 1
+        my_box[product] = [count, product.price, product.price * count]
+    else:
+        my_box[product] = [1, product.price, product.price]
     return redirect('home')
 
 
@@ -59,12 +67,29 @@ def catalog(request, name_kind):
     return render(request, 'seeds/catalog.html', context)
 
 
+def basket_order(request):
+    buyer0 = Buyer.objects.get(id=1)
+    if user == buyer0:
+        return redirect('basket')
+
+    return render(request, 'seeds/basket_order.html')
+
+
+
 def basket(request):
+    global my_box
+    list_my_box = []
+    amount_order = 0
+
+    for k, v in my_box.items():
+        list_my_box.append(f'{k} -- {v[0]}шт.  --  {v[2]}руб.')
+        amount_order += v[2]
     context = {
-        'title': 'tit',
-        'user': user,
+        'basket': list_my_box,
+        'amount_order': amount_order,
     }
     return render(request, 'seeds/basket.html', context)
+
 
 
 def login_func(request):
@@ -85,7 +110,7 @@ def login_func(request):
                 if buyer.password == password:
                     user = buyer
                     info['user'] = user
-                    return redirect('welcome')
+                    return redirect('home')
         if x:
             info['error'] = 'Неверный пароль'
             return render(request, 'seeds/login.html', info)
@@ -116,7 +141,7 @@ def registry(request):
         Buyer.objects.create(login=login, password=password, email=email)
         user = Buyer.objects.get(login=login)
         info['user'] = user
-        return redirect('welcome')
+        return redirect('home')
     return render(request, 'seeds/registry.html')
 
 

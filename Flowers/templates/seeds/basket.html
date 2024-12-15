@@ -1,10 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
 
-</body>
-</html>
+{% block title %}
+    {{ block.super }}
+{% endblock %}
+
+{% block content %}
+<h1>Корзина</h1>
+<ul>
+    {% for instance in basket %}
+        <li>
+            {{ forloop.counter }}.{{ instance }}
+        </li>
+    {% endfor %}
+    <p>Итого:  {{ amount_order }}</p>
+</ul>
+<a href="http://127.0.0.1:8000/basket_order/"><button type="submit">Оформить заказ</button></a>
+<p>Чтобы офпрмить заказ нужно войти или зарегистрироваться</p>
+
+{% endblock %}
+
+{% block pagination %}
+{% endblock %}
