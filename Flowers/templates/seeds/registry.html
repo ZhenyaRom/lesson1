@@ -1,28 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %}
+    Вход/регистрация
+{% endblock %}
+
+{% block content %}
     <form method="post">
+        <h4>Регистрация</h4>
         {% csrf_token %}
         <p>{{ error }}</p>
-        <label for="login">Введите логин</label>
-        <input type="text" id="login" name="login" maxlength="50" required>
-
-        <label for="password">Введите пароль</label>
-        <input type="text" id="password" name="password" minlength="8" required>
-
-        <label for="password_again">Повторите пароль</label>
-        <input type="text" id="password_again" name="password_again" minlength="8" required>
-
-        <label for="email">Введите email</label>
-        <input type="text" id="email" name="email" maxlength="50" required>
-
+        <ul>
+            <li>
+                <label for="login">Введите логин</label>
+                <input type="text" id="login" name="login" maxlength="50" required>
+            </li>
+            <br>
+            <li>
+                <label for="password">Введите пароль</label>
+                <input type="text" id="password" name="password" minlength="8" required>
+            </li>
+            <br>
+            <li>
+                <label for="password_again">Повторите пароль</label>
+                <input type="text" id="password_again" name="password_again" minlength="8" required>
+            </li>
+            <br>
+            <li>
+                <label for="email">Введите email</label>
+                <input type="text" id="email" name="email" maxlength="50" required>
+            </li>
+        </ul>
         <button type="submit">Отправить</button>
 
     </form>
-
-</body>
-</html>
+{% endblock %}
+{% block pagination %}
+{% endblock %}

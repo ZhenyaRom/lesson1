@@ -1,8 +1,10 @@
+from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 from django.http import HttpResponse
 from django.views import View
-from .forms import ContactForm
+from django.http import HttpResponseRedirect
+from .forms import ContactForm, BuyerForm
 from .models import *
 
 
@@ -12,28 +14,112 @@ my_box = {}
 
 
 def contact_view(request):
+    global user
+    context = {'user': user}
     if request.method == 'POST':
         form = ContactForm(request.POST)
         if form.is_valid():  # Если форма валидна, обрабатываем данные
             name = form.cleaned_data['name']
             email = form.cleaned_data['email']
             message = form.cleaned_data['message']
-            # Здесь можно отправить сообщение по email или сохранить в базу данных
-            return render(request, 'seeds/contact_plus.html', {'name': name})
-            #return HttpResponse(f"Спасибо, {name}! Мы получили ваше сообщение.")
+            Post.objects.create(name=name, email=email, message=message)
+            post = f"Спасибо, {name}! Мы получили ваше сообщение."
+            context['post'] = post
+            return render(request, 'seeds/home.html', context)
     else:
         # GET-запрос, создаём пустую форму
         form = ContactForm()
-        return render(request, 'seeds/contact.html', {'form': form})
+        context['form'] = form
+        return render(request, 'seeds/contact.html', context)
+
+
+# def registry_view(request):
+#     global user
+#     info = {'error': ''}
+#     if request.method == 'POST':
+#         form = BuyerForm(request.POST)
+#         if form.is_valid():
+#             login = form.cleaned_data['login']
+#             password = form.cleaned_data['password']
+#             password_again = form.cleaned_data['password_again']
+#             email = form.cleaned_data['email']
+#             buyers = Buyer.objects.all()
+#             if password != password_again:
+#                 info['error'] = 'Пароли не совпадают'
+#                 return render(request, 'seeds/success_order.html', info)
+#             for buyer in buyers:
+#                 if buyer.login == login:
+#                     info['error'] = 'Пользователь с таким "login" уже существует'
+#                     return render(request, 'seeds/success_order.html', info)
+#                 if buyer.email == email:
+#                     info['error'] = 'Пользователь с таким email уже существует'
+#                     return render(request, 'seeds/success_order.html', info)
+#             Buyer.objects.create(login=login, password=password, email=email)
+#             user = Buyer.objects.get(login=login)
+#             info['user'] = user
+#             post = f'{user}, вы успешно зарегистрировались.\n Мы рады приветствовать вас в нашем магазине.'
+#             return render(request, 'seeds/home.html', {'post': post})
+#         #return redirect('home')
+#     else:
+#         forma = BuyerForm()
+#         return render(request, 'seeds/success_order.html', {'forma': forma})
 
 
 def home(request):
-    kinds = Kind.objects.all()
-    return render(request, 'seeds/home.html', {'kinds': kinds})
+    global user
+    post = ("Мы рады Вас видеть в нашем интернет-магазине семян! "
+            "Мы продаем семена ведущих мировых и российских производителей!")
+    post_plus = ("Ассортимент нашего Интернет-магазина постоянно пополняется. Если Вы желаете найти необходимый Вам товар, "
+                 "то самый простой способ - воспользуйтесь нашим каталогом. Все товары разбиты на товарные группы по которым "
+                 "можно отсортировать список товаров."
+                 "Найти товар можно также при помощи поисковой системы.  Для этого необходимо набрать слово в форме запроса "
+                 "и нажать на кнопку справа. Результатом Вашего поиска будет список товаров имеющих это слово или словосочетание "
+                 "в описании или названии.")
+    context = {
+        'post': post,
+        'post_plus': post_plus,
+        'user': user
+    }
+    return render(request, 'seeds/home.html', context)
 
 
-def welcome(request):
-    return render(request, 'seeds/welcome.html', {'user': user})
+def cabinet(request, question=''):
+    global user
+    context = {'user': user}
+    if user == Buyer.objects.get(id=1):
+        post = 'Чтобы попасть в личный кабинет нужно войти или зарегистрироваться'
+        context['post'] = post
+        return render(request, 'seeds/home.html', context)
+    if request.method == 'POST':
+        context['new_password_true'] = True
+        password = request.POST.get('password')
+        new_password = request.POST.get('new_password')
+        new_password_again = request.POST.get('new_password_again')
+        password_control = user.password
+        if password == password_control:
+            if new_password == new_password_again:
+                user.password = new_password
+                user.save()
+                post = f'{user}, вы успешно поменяли пароль.'
+                context['post'] = post
+                return render(request, 'seeds/home.html', context)
+            context['error'] = 'Пароли не совпадают'
+            return render(request, 'seeds/cabinet.html', context)
+        context['error'] = 'Неверный пароль'
+        return render(request, 'seeds/cabinet.html', context)
+    else:
+        print('?')
+        if question == 'my_order':
+            # filtered_order = Order.objects.all()
+            filtered_order = Order.objects.filter(author_order__id=user.id)
+            context['filtered_order'] = filtered_order
+            return render(request, 'seeds/cabinet.html', context)
+        elif question == 'new_password':
+            context['new_password_true'] = True
+            return render(request, 'seeds/cabinet.html', context)
+        else:
+            return render(request, 'seeds/cabinet.html', context)
+
 
 
 def add_basket(request, name_product):
@@ -41,87 +127,152 @@ def add_basket(request, name_product):
     product = Product.objects.get(name_product=name_product)
     if product in my_box.keys():
         count = my_box.get(product)[0] + 1
-        my_box[product] = [count, product.price, product.price * count]
+        my_box[product] = [count, product.price * count]
     else:
-        my_box[product] = [1, product.price, product.price]
-    return redirect('home')
+        my_box[product] = [1, product.price]
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
-def catalog(request, name_kind):
+def catalog(request, name_kind='все товары'):
+    global user
     global per_page
     kinds = Kind.objects.all()
-    if name_kind != 'all':
+    if name_kind != 'все товары':
         filtered_products = Product.objects.filter(kind__name_kind=name_kind)
     else:
         filtered_products = Product.objects.all()
     if request.method == 'POST':
-        per_page = request.POST.get('page_len')
+        search_object = request.POST.get('search_object')
+        if search_object != None:
+            filtered_products = Product.objects.filter(Q(name_product__icontains=search_object) |
+                                                       Q(specification_product__icontains=search_object))
+
+        else:
+            per_page = request.POST.get('page_len')
     paginator = Paginator(filtered_products, per_page)  # создаем пагинатор
-    page_number = request.GET.get('page')  # получаем номер страницы, на которую переходит пользователь
+    page_number = request.GET.get('page', 1)  # получаем номер страницы, на которую переходит пользователь
     page_obj = paginator.get_page(page_number)  # получаем товары для текущей страницы
     context = {
         'page_obj': page_obj,
         'kinds': kinds,
+        'name_kind': name_kind,
+        'user': user
     }
-
     return render(request, 'seeds/catalog.html', context)
 
 
 def basket_order(request):
-    buyer0 = Buyer.objects.get(id=1)
-    if user == buyer0:
-        return redirect('basket')
-
-    return render(request, 'seeds/basket_order.html')
-
-
-
-def basket(request):
+    global user
     global my_box
+    buyer0 = Buyer.objects.get(id=1)
     list_my_box = []
     amount_order = 0
-
     for k, v in my_box.items():
-        list_my_box.append(f'{k} -- {v[0]}шт.  --  {v[2]}руб.')
-        amount_order += v[2]
+        list_my_box.append(f'{k} -- {v[0]}шт.  --  {v[1]}руб.')
+        amount_order += v[1]
+    if user == buyer0:
+        return redirect('basket')
+    if request.method == 'POST':
+        name_buyer = request.POST.get('name_buyer')
+        address_buyer = request.POST.get('address_buyer')
+        text_order = request.POST.get('text_order')
+        list_product = str(my_box)
+
+        order = Order.objects.create(author_order=user, name_buyer=name_buyer, address_buyer=address_buyer,
+                         list_product=list_product, amount_order=amount_order, text_order=text_order)
+        my_box = {}
+        post = f'{user}, ваш заказ успешно оформлен.\n Номер вашего заказа {order}'
+        post_plus = ('В течение трех рабочих дней к вам на электронную почту будет отправлен счет, '
+                     'который необходимо оплатить. После оплаты напишите нам письмо на email или в обратную '
+                     'связь на сайте магазина. В письме укажите сумму и дату платежа. '
+                     'При отсутствии оплаты в течении десяти дней с момента выставления счета заказ аннулируется.')
+        context = {
+            'post': post,
+            'post_plus': post_plus,
+            'user': user
+        }
+        return render(request, 'seeds/home.html', context)
+    else:
+        context = {
+            'basket': list_my_box,
+            'amount_order': amount_order,
+            'user': user
+        }
+        return render(request, 'seeds/basket_order.html', context)
+
+def basket(request):
+    global user
+    global my_box
+    list_basket_product = my_box.keys()
+    list_product_quantity = [i[0] for i in my_box.values()]
+    list_product_amount = [i[1] for i in my_box.values()]
+    amount_in_basket = sum(list_product_amount)
+
     context = {
-        'basket': list_my_box,
-        'amount_order': amount_order,
+        'list_basket_product': list_basket_product,
+        'list_product_quantity': list_product_quantity,
+        'list_product_amount': list_product_amount,
+        'amount_in_basket': amount_in_basket,
+        'user': user
     }
     return render(request, 'seeds/basket.html', context)
 
 
+# def basket(request):
+#     global user
+#     global my_box
+#     list_my_box = []
+#     amount_order = 0
+#
+#     for k, v in my_box.items():
+#         list_my_box.append(f'{k} -- {v[0]}шт.  --  {v[1]}руб.')
+#         amount_order += v[1]
+#     context = {
+#         'basket': list_my_box,
+#         'amount_order': amount_order,
+#         'user': user
+#     }
+#     return render(request, 'seeds/basket.html', context)
+
 
 def login_func(request):
     global user
-    info = {'error': ''}
+    context = {
+        'user': user,
+        'error': '',
+    }
     if request.method == 'POST':
         login = request.POST.get('login')
         password = request.POST.get('password')
         password_again = request.POST.get('password_again')
         buyers = Buyer.objects.all()
         if password != password_again:
-            info['error'] = 'Пароли не совпадают'
-            return render(request, 'seeds/login.html', info)
+            context['error'] = 'Пароли не совпадают'
+            return render(request, 'seeds/login.html', context)
         x = False
         for buyer in buyers:
             if buyer.login == login:
                 x = True
                 if buyer.password == password:
                     user = buyer
-                    info['user'] = user
-                    return redirect('home')
+                    post = f'{user}, рады приветствовать вас в нашем магазине.'
+                    context['post'] = post
+                    context['user'] = user
+                    return render(request, 'seeds/home.html', context)
         if x:
-            info['error'] = 'Неверный пароль'
-            return render(request, 'seeds/login.html', info)
-        info['error'] = 'Пользователь с таким login не зарегистрирован'
-        return render(request, 'seeds/login.html', info)
-    return render(request, 'seeds/login.html')
+            context['error'] = 'Неверный пароль'
+            return render(request, 'seeds/login.html', context)
+        context['error'] = 'Пользователь с таким login не зарегистрирован'
+        return render(request, 'seeds/login.html', context)
+    return render(request, 'seeds/login.html', context)
 
 
 def registry(request):
     global user
-    info = {'error': ''}
+    context = {
+        'user': user,
+        'error': '',
+    }
     if request.method == 'POST':
         login = request.POST.get('login')
         password = request.POST.get('password')
@@ -129,19 +280,22 @@ def registry(request):
         email = request.POST.get('email')
         buyers = Buyer.objects.all()
         if password != password_again:
-            info['error'] = 'Пароли не совпадают'
-            return render(request, 'seeds/registry.html', info)
+            context['error'] = 'Пароли не совпадают'
+            return render(request, 'seeds/registry.html', context)
         for buyer in buyers:
             if buyer.login == login:
-                info['error'] = 'Пользователь с таким "login" уже существует'
-                return render(request, 'seeds/registry.html', info)
+                context['error'] = 'Пользователь с таким "login" уже существует'
+                return render(request, 'seeds/registry.html', context)
             if buyer.email == email:
-                info['error'] = 'Пользователь с таким email уже существует'
-                return render(request, 'seeds/registry.html', info)
+                context['error'] = 'Пользователь с таким email уже существует'
+                return render(request, 'seeds/registry.html', context)
         Buyer.objects.create(login=login, password=password, email=email)
         user = Buyer.objects.get(login=login)
-        info['user'] = user
-        return redirect('home')
-    return render(request, 'seeds/registry.html')
+        post = f'{user}, вы успешно зарегистрировались.\n Мы рады приветствовать вас в нашем магазине.'
+        context['post'] = post
+        context['user'] = user
+        return render(request, 'seeds/home.html', context)
+        #return redirect('home')
+    return render(request, 'seeds/registry.html', context)
 
 

@@ -5,27 +5,39 @@
 {% endblock %}
 
 {% block content %}
+<form method="post">
+    {% csrf_token %}
+    <label for="search_object">Поиск</label>
+    <input type="text" id="search_object" name="search_object" maxlength="30" required>
+    <button type="submit">Отправить</button>
+</form>
 <nav>
-    <a href="/kind/all/">все</a> |
+    <a href="/kind/все товары/">все</a> |
     {% for kind in kinds %}
     <a href="/kind/{{ kind.name_kind|urlencode }}/">{{ kind.name_kind }}</a> |
     {% endfor %}
-<!--    <a href="?kind=цветы">Цветы</a> |-->
-<!--    <a href="?kind=ягоды">Ягоды</a> |-->
-<!--    <a href="?kind=разное">Разное</a>-->
 </nav>
-{% if page_obj %}
-    <ul>
-        {% for product in page_obj %}
-        <li>
-            <strong>{{ product.name_product }}</strong> - {{ product.price }} ₽<br>
-            Описание: {{ product.specification_product }}
-            <br>
 
-            <a href="/add_basket/{{ product.name_product|urlencode }}/"><button type="submit">Купить</button></a>
-        </li>
-        {% endfor %}
-    </ul>
+    <h2>Каталог товаров</h2> <!-- Заголовок раздела -->
+    <h3>{{ name_kind }}</h3>
+{% if page_obj %}
+<!-- Сетка товаров -->
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for product in page_obj %}
+    <!-- Каждая карточка товара -->
+    <div class="col">
+        <div class="card h-100"> <!-- Карточка Bootstrap с высотой, заполняющей колонку -->
+            <div class="card-body">
+                <h5 class="card-title">{{ product.name_product }}</h5> <!--Название товара -->
+                <p class="card-text">{{ product.specification_product }}</p><!-- Описание товара -->
+                <p class="card-text"><strong>{{ product.price }}₽</strong></p> <!-- Цена товара -->
+                <a href="/add_basket/{{ product.name_product|urlencode }}/"><button type="submit">Купить</button></a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
 {% else %}
     <p>Товары отсутствуют</p>
 {% endif %}

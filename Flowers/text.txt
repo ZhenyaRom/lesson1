@@ -1,15 +1,70 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f9f9f9;
-}
+    <ul>
+        {% for product in page_obj %}
+        <li>
+            <strong>{{ product.name_product }}</strong> - {{ product.price }} ₽<br>
+            Описание: {{ product.specification_product }}
+            <br>
 
-header {
-    background-color: #6b20fd;
-    color: #fff;
-    padding: 10px 20px;
-    text-align: center;
-}
+            <a href="/add_basket/{{ product.name_product|urlencode }}/"><button type="submit">Купить</button></a>
+        </li>
+        {% endfor %}
+    </ul>
 
-h2 {
-color: #333;
-<!--            {{ instance[0].name_product }}  {{ instance[1][0] }}шт. &#45;&#45; {{ instance[1][2] }}руб.-->
+
+
+<!-- Навигация по страницам (пагинация) -->
+<nav class="mt-4">
+    <ul class="pagination justify-content-center">
+        <!-- Кнопка "Назад" -->
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{page_obj.previous_page_number }}">Назад</a> <!-- Ссылка на предыдущую страницу -->
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">Назад</span> <!--Заблокированная кнопка, если предыдущей страницы нет -->
+        </li>
+        {% endif %}
+        <!-- Номера страниц -->
+        {% for num in page_obj.paginator.page_range %}
+            {% if num == page_obj.number %}
+            <li class="page-item active">
+                <span class="page-link">{{ num }}</span> <!--Активная страница -->
+            </li>
+            {% elif num > page_obj.number|add:-2 and num < page_obj.number|add:2 %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a> <!-- Ссылка на соседние страницы -->
+            </li>
+            {% endif %}
+        {% endfor %}
+        <!-- Кнопка "Вперёд" -->
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{page_obj.next_page_number }}">Вперёд</a> <!-- Ссылка на следующую страницу -->
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">Вперёд</span> <!--Заблокированная кнопка, если следующей страницы нет -->
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+
+class CustomContactForm(forms.Form):
+    name = forms.CharField(label='Ваше имя', max_length=100)
+    email = forms.EmailField(label='Ваш email')
+    message = forms.CharField(label='Сообщение', widget=forms.Textarea)
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if not email.endswith('@example.com'):
+            raise ValidationError('Email должен заканчиваться на @example.com')
+        return email
+
+
+                <label for="select_page_len">Изменить количество:</label>
+                <select name="page_len" id="select_page_len" style="font-size: inherit;">
+                    <option>-</option>
+                    <option>+</option>
+                </select>
+                <button type="submit" >Применить</button>

@@ -1,10 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-Hi
-</body>
-</html>
+{% extends 'seeds/basket.html' %}
+
+{% block title %}
+    Заказ
+{% endblock %}
+
+{% block content %}
+    {{ block.super }}
+{% endblock %}
+
+{% block pagination %}
+    <form method="post">
+        {% csrf_token %}
+        <h2>Оформление заказа</h2>
+        <label for="name_buyer">Введите получателя</label>
+        <input type="text" id="name_buyer" name="name_buyer" maxlength="100" required>
+
+        <label for="address_buyer">Введите адрес получателя</label>
+        <input type="text" id="address_buyer" name="address_buyer" maxlength="300" required>
+
+        <label for="text_order">Примечание</label>
+        <input type="text" id="text_order" name="text_order" maxlength="500">
+
+        <button type="submit">Отправить</button>
+<!--        <a href="http://127.0.0.1:8000/basket_order/"></a>-->
+    </form>
+{% endblock %}

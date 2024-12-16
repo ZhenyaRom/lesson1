@@ -20,23 +20,12 @@ class Kind(models.Model):
         return self.name_kind
 
 
-class Category(models.Model):
-    name_category = models.CharField(max_length=50, verbose_name='Название категории')
-    specification_category = models.TextField(verbose_name='Описание категории')
-    kind = models.ForeignKey(Kind, on_delete=models.PROTECT, verbose_name='Вид')
-
-    def __str__(self):
-        return self.name_category
-
-
 class Product(models.Model):
     name_product = models.CharField(max_length=50, verbose_name='Название сорта')
     specification_product = models.TextField(verbose_name='Описание сорта')
     fabricator = models.CharField(max_length=50, verbose_name='Производитель')
     amount = models.PositiveSmallIntegerField(verbose_name='Количество в упаковке')
     price = models.DecimalField(max_digits=5, decimal_places=2, verbose_name='Цена')
-    balance = models.PositiveIntegerField(verbose_name='Остаток')
-    category = models.ForeignKey(Category, on_delete=models.PROTECT, null=True, blank=True, verbose_name='Категория')
     kind = models.ForeignKey(Kind, on_delete=models.PROTECT, null=True, blank=True, verbose_name='Вид')
 
     def __str__(self):
@@ -55,3 +44,16 @@ class Order(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+
+class Post(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Ваше имя")
+    email = models.EmailField(verbose_name="email")
+    message = models.TextField(verbose_name='Сообщение')
+
+
+# class Bascet(models.Model):
+#     buyer = models.ForeignKey(max_length=100, verbose_name="Ваше имя")
+#     product = models.ManyToManyField(verbose_name="email")
+#     quantity = models.PositiveSmallIntegerField()
+#     order = models.OneToOneField()

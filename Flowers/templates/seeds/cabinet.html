@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Кабинет
+{% endblock %}
+
+{% block content %}
+<h2>{{ user }}, вы зашли в личный кабинет.</h2>
+<h3>Здесь вы можете:</h3>
+
+<div>
+    <nav>
+        <ul>
+            <li>
+                <a href="/cabinet/new_password/">Сменить пароль</a>
+            </li>
+            <li>
+                <a href="/cabinet/my_order/">Смотреть историю заказов</a>
+            </li>
+            <li>
+                <a href="http://127.0.0.1:8000/contact/">Отправить нам сообщение</a>
+            </li>
+            <li>
+                <a href="http://127.0.0.1:8000/">Вернуться на главную</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+{% endblock %}
+
+{% block pagination %}
+{% if filtered_order %}
+<h1>Список заказов</h1>
+<ul>
+    {% for order in filtered_order %}
+        <li>
+            {{ forloop.counter }}. Заказ № {{ order.id }}  от  {{ order.date_create_order }}  на сумму {{ order.amount_order }}
+            {% if order.active_order %}
+            -- получен
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% if new_password_true %}
+    <form method="post">
+        <h5>Смена пароля</h5>
+        <br>
+        {% csrf_token %}
+        <p>{{ error }}</p>
+        <ul>
+            <li>
+                <label for="password">Введите пароль</label>
+                <input type="text" id="password" name="password" minlength="8" required>
+            </li>
+            <br>
+            <li>
+                <label for="new_password">Введите  новый пароль</label>
+                <input type="text" id="new_password" name="new_password" minlength="8" required>
+            </li>
+            <br>
+            <li>
+                <label for="new_password_again">Повторите пароль</label>
+                <input type="text" id="new_password_again" name="new_password_again" minlength="8" required>
+            </li>
+        </ul>
+        <button type="submit">Отправить</button>
+    </form>
+{% endif %}
+{% endblock %}

@@ -5,15 +5,8 @@
 {% endblock %}
 
 {% block content %}
-<h1>Лучший потому-что свой)</h1>
-<h2>Категории товаров</h2>
-<ul>
-    {% for kind in kinds %}
-        <li>
-            <a href="/kind/{{ kind.name_kind|urlencode }}/">{{ kind.name_kind }}</a>
-        </li>
-    {% endfor %}
-</ul>
+<h1>{{ post }}</h1>
+<h3>{{ post_plus }}</h3>
 {% endblock %}
 
 {% block pagination %}
