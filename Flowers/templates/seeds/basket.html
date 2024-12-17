@@ -6,21 +6,28 @@
 
 {% block content %}
 <h1>Список товаров в корзине</h1>
+{% if my_basket %}
 <ul>
-    {% for p, q, a in list_basket_product, list_product_quantity, list_product_amount %}
+    {% for paragraph in my_basket %}
         <li>
-            {{ forloop.counter }}.{{ p }} * {{ q }} = {{ a }}
+            {{ forloop.counter }}.{{ paragraph.product }} по {{ paragraph.product.price }}  ---  {{ paragraph.quantity }}шт.
             <p>Изменить количество
-                <a href="/basket/product_plus/"><button type="submit">+</button></a>
-                <a href="/basket/product_minus/"><button type="submit">-</button></a></p>
+                <a href="/add_basket/{{ paragraph.product.name_product|urlencode }}/+/"><button type="submit">+</button></a>
+                <a href="/add_basket/{{ paragraph.product.name_product|urlencode }}/-/"><button type="submit">-</button></a></p>
             <br>
         </li>
     {% endfor %}
-    <p>Итого:  {{ amount_in_basket }}</p>
+    <p>Итого:  {{ amount_basket }}</p>
 </ul>
+<br>
+<br>
+<br>
+<a href="http://127.0.0.1:8000/basket_order/"><button type="submit">Оформить заказ</button></a>
+    <p></p>
+{% else %}
+<p>Ваша корзина пуста</p>
+{% endif %}
 {% endblock %}
 
 {% block pagination %}
-    <a href="http://127.0.0.1:8000/basket_order/"><button type="submit">Оформить заказ</button></a>
-    <p>Чтобы офпрмить заказ нужно войти или зарегистрироваться</p>
 {% endblock %}

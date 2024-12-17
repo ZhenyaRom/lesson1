@@ -39,7 +39,7 @@ class Order(models.Model):
     list_product = models.TextField(verbose_name='Список товаров')
     amount_order = models.DecimalField(max_digits=7, decimal_places=2, verbose_name='Стоимость заказа')
     date_create_order = models.DateTimeField(auto_now_add=True, verbose_name='Дата заказа')
-    active_order = models.BooleanField(default=True, verbose_name='Заказ активный?')
+    active_order = models.BooleanField(default=False, verbose_name='Заказ получен?')
     text_order = models.TextField(verbose_name='Примечание', blank=True)
 
     def __str__(self):
@@ -52,8 +52,8 @@ class Post(models.Model):
     message = models.TextField(verbose_name='Сообщение')
 
 
-# class Bascet(models.Model):
-#     buyer = models.ForeignKey(max_length=100, verbose_name="Ваше имя")
-#     product = models.ManyToManyField(verbose_name="email")
-#     quantity = models.PositiveSmallIntegerField()
-#     order = models.OneToOneField()
+class Basket(models.Model):
+    buyer = models.ForeignKey(Buyer, on_delete=models.CASCADE, verbose_name='Автор заказа')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name="Продукт в корзине")
+    quantity = models.PositiveSmallIntegerField(verbose_name='Количество')
+

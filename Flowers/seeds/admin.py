@@ -34,3 +34,10 @@ class PostAdmin(admin.ModelAdmin):
     list_display = ('name', 'email', 'message')
     search_fields = ('name', 'email')
     list_filter = ('name', 'email')
+
+
+# @ admin.register(Basket)
+# class BasketAdmin(admin.ModelAdmin):
+#     list_display = ('buyer', 'product', 'quantity')
+#     search_fields = ('buyer', 'product')
+#     list_filter = ('buyer', 'product')

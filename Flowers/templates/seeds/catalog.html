@@ -31,7 +31,7 @@
                 <h5 class="card-title">{{ product.name_product }}</h5> <!--Название товара -->
                 <p class="card-text">{{ product.specification_product }}</p><!-- Описание товара -->
                 <p class="card-text"><strong>{{ product.price }}₽</strong></p> <!-- Цена товара -->
-                <a href="/add_basket/{{ product.name_product|urlencode }}/"><button type="submit">Купить</button></a>
+                <a href="/add_basket/{{ product.name_product|urlencode }}/+/"><button type="submit">Купить</button></a>
             </div>
         </div>
     </div>
