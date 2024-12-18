@@ -1,8 +1,7 @@
 from django.db import models
 
 
-# Create your models here.
-class Buyer(models.Model):
+class Buyer(models.Model):  # Модель покупателя (пользователя)
     login = models.CharField(max_length=50)
     password = models.CharField(max_length=30)
     email = models.EmailField(unique=True)
@@ -12,19 +11,16 @@ class Buyer(models.Model):
         return self.login
 
 
-class Kind(models.Model):
+class Kind(models.Model):  #  Модель видов растений, для классификации
     name_kind = models.CharField(max_length=50, verbose_name='Название вида')
-    specification_kind = models.TextField(verbose_name='Описание вида')
 
     def __str__(self):
         return self.name_kind
 
 
-class Product(models.Model):
+class Product(models.Model):  # Модель товара
     name_product = models.CharField(max_length=50, verbose_name='Название сорта')
     specification_product = models.TextField(verbose_name='Описание сорта')
-    fabricator = models.CharField(max_length=50, verbose_name='Производитель')
-    amount = models.PositiveSmallIntegerField(verbose_name='Количество в упаковке')
     price = models.DecimalField(max_digits=5, decimal_places=2, verbose_name='Цена')
     kind = models.ForeignKey(Kind, on_delete=models.PROTECT, null=True, blank=True, verbose_name='Вид')
 
@@ -32,7 +28,7 @@ class Product(models.Model):
         return self.name_product
 
 
-class Order(models.Model):
+class Order(models.Model):  # Модель оформленных заказов
     author_order = models.ForeignKey(Buyer, on_delete=models.DO_NOTHING, verbose_name='Автор заказа')
     name_buyer = models.CharField(max_length=100, verbose_name='Получатель')
     address_buyer = models.CharField(max_length=300, verbose_name='Адрес получателя')
@@ -46,14 +42,14 @@ class Order(models.Model):
         return str(self.id)
 
 
-class Post(models.Model):
+class Post(models.Model):  # Сообщения посетителей сайта
     name = models.CharField(max_length=100, verbose_name="Ваше имя")
     email = models.EmailField(verbose_name="email")
     message = models.TextField(verbose_name='Сообщение')
 
 
-class Basket(models.Model):
-    buyer = models.ForeignKey(Buyer, on_delete=models.CASCADE, verbose_name='Автор заказа')
+class Basket(models.Model):  # Корзина покупателя
+    buyer = models.ForeignKey(Buyer, on_delete=models.CASCADE, verbose_name='Хозяин корзины')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name="Продукт в корзине")
     quantity = models.PositiveSmallIntegerField(verbose_name='Количество')
 
