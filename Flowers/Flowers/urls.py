@@ -20,9 +20,4 @@ from django.urls import include, path
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('seeds.urls')),
-    # path('catalog/', catalog),
-    # path('login/', login_func),
-    # path('basket/', basket),
-    # path('registry/', registry),
-    # path('', welcome),
 ]
